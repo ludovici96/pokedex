@@ -28,6 +28,9 @@ func startRepl() {
 		fmt.Printf("Your command was: %s\n", firstWord)
 	}
 
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "Error reading input:", err)
+	}
 }
 
 func cleanInput(text string) []string  {
