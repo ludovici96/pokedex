@@ -8,7 +8,9 @@ import (
 )
 
 type config struct {
-	commands map[string]cliCommand
+	commands         map[string]cliCommand
+	nextLocationsURL *string
+	prevLocationsURL *string
 }
 
 type cliCommand struct {
@@ -17,17 +19,22 @@ type cliCommand struct {
 	callback    func(*config) error
 }
 
-func getCommands() map[string]cliCommand  {
+func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"exit": {
-			name: "exit",
+			name:        "exit",
 			description: "Exit the pokedex",
-			callback: commandExit,
+			callback:    commandExit,
 		},
 		"help": {
-			name: "help",
+			name:        "help",
 			description: "Dispalys a help message",
-			callback: commandHelp,
+			callback:    commandHelp,
+		},
+		"map": {
+			name:        "map",
+			description: "Display the next 20 location areas",
+			callback:    commandMap,
 		},
 	}
 }
@@ -35,10 +42,6 @@ func getCommands() map[string]cliCommand  {
 func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 
-	//cfg := &config{
-	//	commands: getCommands(),
-	//}
-	
 	for {
 		fmt.Print("Pokedex > ")
 
@@ -72,7 +75,7 @@ func startRepl(cfg *config) {
 	}
 }
 
-func cleanInput(text string) []string  {
+func cleanInput(text string) []string {
 	cleaned := strings.Fields(strings.ToLower(strings.TrimSpace(text)))
 	return cleaned
 }
