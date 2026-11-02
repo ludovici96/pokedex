@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"github.com/ludovici96/pokedex/internal/pokecache"
 )
 
 type config struct {
 	commands         map[string]cliCommand
 	nextLocationsURL *string
 	prevLocationsURL *string
+	pokeapiCache 	 *pokecache.Cache
 }
 
 type cliCommand struct {
@@ -35,6 +37,11 @@ func getCommands() map[string]cliCommand {
 			name:        "map",
 			description: "Display the next 20 location areas",
 			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Display the previous 20 location areas",
+			callback:    commandMapb,
 		},
 	}
 }

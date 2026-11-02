@@ -26,33 +26,37 @@ func commandMap(cfg *config) error {
 		url = *cfg.nextLocationsURL
 	}
 
-	res, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
+	body, ok := cfg.pokeapiCache.Get(url)
 
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("API request failed: %s", res.Status)
-	}
+	if !ok {
+		res, err := http.Get(url)
+		if err != nil {
+			return err
+		}
+		defer res.Body.Close()
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return err
+		if res.StatusCode != http.StatusOK {
+			return fmt.Errorf("API request failed: %s", res.Status)
+		}
+
+		body, err = io.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+
+		cfg.pokeapiCache.Add(url, body)
 	}
 
 	var data locationAreaResponse
 
-	err = json.Unmarshal(body, &data)
+	err := json.Unmarshal(body, &data)
 	if err != nil {
 		return err
 	}
 
-	// Update pagination URLs
 	cfg.nextLocationsURL = data.Next
 	cfg.prevLocationsURL = data.Previous
 
-	// Print location area names
 	for _, location := range data.Results {
 		fmt.Println(location.Name)
 	}
