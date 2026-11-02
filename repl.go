@@ -7,6 +7,27 @@ import (
 	"bufio"
 )
 
+type cliCommand struct {
+	name        string
+	description string
+	callback    func() error
+}
+
+func getCommands() map[string]cliCommand  {
+	return map[string]cliCommand{
+		"exit": {
+			name: "exit",
+			description: "Exit the pokedex",
+			callback: commandExit,
+		},
+		"help": {
+			name: "help",
+			description: "Dispalys a help message",
+			callback: commandHelp,
+		},
+	}
+}
+
 func startRepl() {
 	scanner := bufio.NewScanner(os.Stdin)
 	
@@ -23,9 +44,19 @@ func startRepl() {
 			continue
 		}
 
-		firstWord := words[0]
+		commandName := words[0]
 
-		fmt.Printf("Your command was: %s\n", firstWord)
+		command, ok := getCommands()[commandName]
+		if !ok {
+			fmt.Println("Unknown command")
+			continue
+		}
+
+		err := command.callback()
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+
 	}
 
 	if err := scanner.Err(); err != nil {
