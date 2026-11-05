@@ -4,14 +4,14 @@ import (
 	"fmt"
 )
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, args ...string) error {
 	if cfg.prevLocationsURL == nil {
 		return fmt.Errorf("you're on the first page")
 	}
 
 	url := *cfg.prevLocationsURL
 
-	data, err := fetchLocationAreas(cfg, url)
+	data, err := fetch[locationAreaResponse](cfg, url)
 	if err != nil {
 		return err
 	}

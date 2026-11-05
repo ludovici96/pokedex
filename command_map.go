@@ -19,14 +19,14 @@ type locationAreaResponse struct {
 	} `json:"results"`
 }
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, args ...string) error {
 	url := locationAreaURL
 
 	if cfg.nextLocationsURL != nil {
 		url = *cfg.nextLocationsURL
 	}
 
-	data, err := fetchLocationAreas(cfg, url)
+	data, err := fetch[locationAreaResponse](cfg, url)
 	if err != nil {
 		return err
 	}
@@ -41,8 +41,8 @@ func commandMap(cfg *config) error {
 	return nil
 }
 
-func fetchLocationAreas(cfg *config, url string) (locationAreaResponse, error) {
-	var data locationAreaResponse
+func fetch[T any](cfg *config, url string) (T, error) {
+	var data T
 
 	if body, ok := cfg.pokeapiCache.Get(url); ok {
 		err := json.Unmarshal(body, &data)
