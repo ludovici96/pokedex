@@ -11,6 +11,7 @@ func commandHelp(cfg *config, args ...string) error {
 	fmt.Println("mapb: Display the previous 20 location areas")
 	fmt.Println("explore <area_name>: Display the Pokemon in a location area")
 	fmt.Println("catch <pokemon>: Try to catch a Pokemon")
+	fmt.Println("inspect <pokemon>: Display details about a caught Pokemon")
 	fmt.Println("exit: Exit the Pokedex")
 
 	return nil
