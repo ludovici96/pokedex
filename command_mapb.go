@@ -1,10 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 )
 
 func commandMapb(cfg *config) error {
@@ -14,31 +11,8 @@ func commandMapb(cfg *config) error {
 
 	url := *cfg.prevLocationsURL
 
-	// Check cache first
-	body, ok := cfg.pokeapiCache.Get(url)
-
-	if !ok {
-		res, err := http.Get(url)
-		if err != nil {
-			return err
-		}
-		defer res.Body.Close()
-
-		if res.StatusCode != http.StatusOK {
-			return fmt.Errorf("API request failed: %s", res.Status)
-		}
-
-		body, err = io.ReadAll(res.Body)
-		if err != nil {
-			return err
-		}
-
-		cfg.pokeapiCache.Add(url, body)
-	}
-
-	var data locationAreaResponse
-
-	if err := json.Unmarshal(body, &data); err != nil {
+	data, err := fetchLocationAreas(cfg, url)
+	if err != nil {
 		return err
 	}
 

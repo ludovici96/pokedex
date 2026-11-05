@@ -8,7 +8,7 @@ import (
 func main() {
 	cfg := &config{
 		commands: getCommands(),
-		pokeapiCache: pokecache.NewCache(5 * time.Second),
+		pokeapiCache: pokecache.NewCache(5 * time.Minute),
 	}
 
 	startRepl(cfg)

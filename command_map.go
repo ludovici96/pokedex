@@ -26,30 +26,7 @@ func commandMap(cfg *config) error {
 		url = *cfg.nextLocationsURL
 	}
 
-	body, ok := cfg.pokeapiCache.Get(url)
-
-	if !ok {
-		res, err := http.Get(url)
-		if err != nil {
-			return err
-		}
-		defer res.Body.Close()
-
-		if res.StatusCode != http.StatusOK {
-			return fmt.Errorf("API request failed: %s", res.Status)
-		}
-
-		body, err = io.ReadAll(res.Body)
-		if err != nil {
-			return err
-		}
-
-		cfg.pokeapiCache.Add(url, body)
-	}
-
-	var data locationAreaResponse
-
-	err := json.Unmarshal(body, &data)
+	data, err := fetchLocationAreas(cfg, url)
 	if err != nil {
 		return err
 	}
@@ -62,4 +39,36 @@ func commandMap(cfg *config) error {
 	}
 
 	return nil
+}
+
+func fetchLocationAreas(cfg *config, url string) (locationAreaResponse, error) {
+	var data locationAreaResponse
+
+	if body, ok := cfg.pokeapiCache.Get(url); ok {
+		err := json.Unmarshal(body, &data)
+		return data, err
+	}
+
+	res, err := http.Get(url)
+	if err != nil {
+		return data, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return data, fmt.Errorf("API request failed: %s", res.Status)
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return data, err
+	}
+
+	if err := json.Unmarshal(body, &data); err != nil {
+		return data, err
+	}
+
+	cfg.pokeapiCache.Add(url, body)
+
+	return data, nil
 }
